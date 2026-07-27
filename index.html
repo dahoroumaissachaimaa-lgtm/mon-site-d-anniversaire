@@ -910,7 +910,7 @@ window.addEventListener('load',()=>{
 // ============ AGE FIXE ============
 document.getElementById('ageNum').textContent = '22';
 
-// ============ COUNTDOWN ============
+// ============ COUNTDOWN CORRIGÉ ============
 function nextBirthday(){
   const now = new Date();
   let y = now.getFullYear();
@@ -926,7 +926,8 @@ function tick(){
   const h = Math.floor(diff/3600000); diff -= h*3600000;
   const m = Math.floor(diff/60000); diff -= m*60000;
   const s = Math.floor(diff/1000);
-  document.getElementById('cdDays').textContent = String(d).padStart(3,'0');
+  // ✅ CORRECTION : padStart(2,'0') au lieu de padStart(3,'0')
+  document.getElementById('cdDays').textContent = String(d).padStart(2,'0');
   document.getElementById('cdHours').textContent = String(h).padStart(2,'0');
   document.getElementById('cdMins').textContent = String(m).padStart(2,'0');
   document.getElementById('cdSecs').textContent = String(s).padStart(2,'0');
@@ -1088,16 +1089,9 @@ loadMsgs();
 
 // Fonction pour envoyer un message sur WhatsApp
 function sendToWhatsApp(name, text) {
-  // Formater le message
   const message = `🎂 *Nouveau message du livre d'or !*\n\n👤 *De :* ${name}\n💬 *Message :* ${text}\n\n📅 *Date :* ${new Date().toLocaleString('fr-FR')}`;
-  
-  // Encoder le message pour l'URL
   const encodedMessage = encodeURIComponent(message);
-  
-  // Créer le lien WhatsApp
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
-  
-  // Ouvrir WhatsApp dans un nouvel onglet
   window.open(whatsappUrl, '_blank');
 }
 
@@ -1113,7 +1107,6 @@ msgForm.addEventListener('submit', function(e) {
     return;
   }
   
-  // Sauvegarder dans localStorage
   const data = JSON.parse(localStorage.getItem('bday_msgs') || '[]');
   data.unshift({
     name: name,
@@ -1121,20 +1114,13 @@ msgForm.addEventListener('submit', function(e) {
   });
   localStorage.setItem('bday_msgs', JSON.stringify(data));
   
-  // Réinitialiser le formulaire
   document.getElementById('msgName').value = '';
   document.getElementById('msgText').value = '';
   
-  // Recharger les messages
   loadMsgs();
-  
-  // Lancer des confettis
   launchConfetti(60);
-  
-  // ============ ENVOYER LE MESSAGE SUR WHATSAPP ============
   sendToWhatsApp(name, text);
   
-  // Message de confirmation
   const btn = this.querySelector('.btn-primary');
   const originalText = btn.innerHTML;
   btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Envoyé sur WhatsApp !';
@@ -1180,7 +1166,6 @@ bgm.addEventListener('error', (e) => {
   playing = false;
 });
 
-// Réessayer de jouer la musique après interaction utilisateur
 document.addEventListener('click', function tryPlayMusic() {
   if (!playing && site.classList.contains('show')) {
     bgm.volume = 0.3;
