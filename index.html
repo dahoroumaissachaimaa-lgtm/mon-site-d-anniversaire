@@ -586,7 +586,7 @@ body.rtl .goal-card h3,body.rtl .foot-brand,body.rtl .q-fr{font-family:var(--fon
 
 <!-- TOP NAV -->
 <nav class="topnav">
-  <div class="logo">Chaimaa<span>·</span>26.08.2004<span>·</span>Roumaissa</div>
+  <div class="logo">Chaimaa<span>·</span>26.08.2004</div>
   <div class="nav-actions">
     <button id="langBtn" class="pill" aria-label="Language">FR / ع</button>
     <button id="themeBtn" class="pill" aria-label="Theme"><i class="fa-solid fa-moon"></i></button>
@@ -835,7 +835,7 @@ body.rtl .goal-card h3,body.rtl .foot-brand,body.rtl .q-fr{font-family:var(--fon
     </div>
   </div>
   <div class="foot-bot">
-    <span>© 2026 · 26 / 08 / 2004</span>
+    <span>© 2026 ·</span>
     <span data-fr="Fait avec amour" data-ar="صُنع بحب">Fait avec amour</span>
   </div>
 </footer>
@@ -855,6 +855,9 @@ body.rtl .goal-card h3,body.rtl .foot-brand,body.rtl .q-fr{font-family:var(--fon
 
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
+// ============ NUMÉRO WHATSAPP (ALGÉRIE) ============
+const WHATSAPP_NUMBER = "213774075155"; // Numéro au format international (sans le +)
+
 // ============ CUSTOM CURSOR ============
 const dot = document.querySelector('.cursor-dot');
 const ring = document.querySelector('.cursor-ring');
@@ -1056,7 +1059,7 @@ document.querySelectorAll('.gal-item').forEach(item=>{
   });
 });
 
-// ============ LIVRE D'OR - MESSAGES SAUVEGARDÉS DANS LOCALSTORAGE ============
+// ============ LIVRE D'OR - AVEC ENVOI VERS WHATSAPP ============
 const msgForm = document.getElementById('msgForm');
 const msgList = document.getElementById('msgList');
 
@@ -1064,7 +1067,6 @@ const msgList = document.getElementById('msgList');
 function loadMsgs(){
   const data = JSON.parse(localStorage.getItem('bday_msgs') || '[]');
   if (data.length === 0) {
-    // Si aucun message, afficher un message invitant à écrire
     msgList.innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--ink-mute);font-family:var(--font-serif);font-size:18px;font-style:italic;border:1px dashed var(--line);border-radius:16px;">
         💫 Soyez le premier à laisser un message !
@@ -1084,6 +1086,21 @@ function loadMsgs(){
 // Charger les messages au démarrage
 loadMsgs();
 
+// Fonction pour envoyer un message sur WhatsApp
+function sendToWhatsApp(name, text) {
+  // Formater le message
+  const message = `🎂 *Nouveau message du livre d'or !*\n\n👤 *De :* ${name}\n💬 *Message :* ${text}\n\n📅 *Date :* ${new Date().toLocaleString('fr-FR')}`;
+  
+  // Encoder le message pour l'URL
+  const encodedMessage = encodeURIComponent(message);
+  
+  // Créer le lien WhatsApp
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+  
+  // Ouvrir WhatsApp dans un nouvel onglet
+  window.open(whatsappUrl, '_blank');
+}
+
 // Formulaire d'ajout de message
 msgForm.addEventListener('submit', function(e) {
   e.preventDefault();
@@ -1096,16 +1113,12 @@ msgForm.addEventListener('submit', function(e) {
     return;
   }
   
-  // Récupérer les messages existants
+  // Sauvegarder dans localStorage
   const data = JSON.parse(localStorage.getItem('bday_msgs') || '[]');
-  
-  // Ajouter le nouveau message au début
   data.unshift({
     name: name,
-    text: text.replace(/[<>]/g, '') // Protéger contre les scripts
+    text: text.replace(/[<>]/g, '')
   });
-  
-  // Sauvegarder dans localStorage
   localStorage.setItem('bday_msgs', JSON.stringify(data));
   
   // Réinitialiser le formulaire
@@ -1115,16 +1128,19 @@ msgForm.addEventListener('submit', function(e) {
   // Recharger les messages
   loadMsgs();
   
-  // Lancer des confettis pour célébrer
+  // Lancer des confettis
   launchConfetti(60);
+  
+  // ============ ENVOYER LE MESSAGE SUR WHATSAPP ============
+  sendToWhatsApp(name, text);
   
   // Message de confirmation
   const btn = this.querySelector('.btn-primary');
   const originalText = btn.innerHTML;
-  btn.innerHTML = '<i class="fa-solid fa-check"></i> Message envoyé !';
+  btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Envoyé sur WhatsApp !';
   setTimeout(() => {
     btn.innerHTML = originalText;
-  }, 2000);
+  }, 3000);
 });
 
 // ============ MUSIC - GESTION AMÉLIORÉE ============
