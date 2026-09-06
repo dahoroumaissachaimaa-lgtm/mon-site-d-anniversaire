@@ -805,7 +805,7 @@ body.rtl .goal-card h3,body.rtl .foot-brand,body.rtl .q-fr{font-family:var(--fon
   <form class="msg-form" id="msgForm" data-aos="fade-up">
     <input type="text" id="msgName" placeholder="Ton prénom" required maxlength="40" />
     <textarea id="msgText" placeholder="Ton message ❤️" required maxlength="300"></textarea>
-    <button type="submit" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> <span data-fr="Envoyer" data-ar="إرسال">Envoyer</span></button>
+    <button type="submit" class="btn-primary"><i class="fa-brands fa-instagram"></i> <span data-fr="Envoyer sur Instagram" data-ar="إرسال عبر إنستغرام">Envoyer sur Instagram</span></button>
   </form>
   <div class="msg-list" id="msgList"></div>
 </section>
@@ -856,7 +856,8 @@ body.rtl .goal-card h3,body.rtl .foot-brand,body.rtl .q-fr{font-family:var(--fon
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
 // ============ NUMÉRO WHATSAPP (ALGÉRIE) ============
-const WHATSAPP_NUMBER = "213774075155"; // Numéro au format international (sans le +)
+const INSTAGRAM_USERNAME = "romy.chaimaa_";
+const INSTAGRAM_DM_URL = `https://ig.me/m/${INSTAGRAM_USERNAME}`;
 
 // ============ CUSTOM CURSOR ============
 const dot = document.querySelector('.cursor-dot');
@@ -1060,13 +1061,14 @@ document.querySelectorAll('.gal-item').forEach(item=>{
   });
 });
 
-// ============ LIVRE D'OR - AVEC ENVOI VERS WHATSAPP ============
+// ============ LIVRE D'OR - ENVOI VERS INSTAGRAM ============
 const msgForm = document.getElementById('msgForm');
 const msgList = document.getElementById('msgList');
 
-// Fonction pour charger les messages depuis localStorage
+// Charger les messages depuis localStorage
 function loadMsgs(){
   const data = JSON.parse(localStorage.getItem('bday_msgs') || '[]');
+
   if (data.length === 0) {
     msgList.innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--ink-mute);font-family:var(--font-serif);font-size:18px;font-style:italic;border:1px dashed var(--line);border-radius:16px;">
@@ -1084,49 +1086,80 @@ function loadMsgs(){
   }
 }
 
-// Charger les messages au démarrage
 loadMsgs();
 
-// Fonction pour envoyer un message sur WhatsApp
-function sendToWhatsApp(name, text) {
-  const message = `🎂 *Nouveau message du livre d'or !*\n\n👤 *De :* ${name}\n💬 *Message :* ${text}\n\n📅 *Date :* ${new Date().toLocaleString('fr-FR')}`;
-  const encodedMessage = encodeURIComponent(message);
-  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
-  window.open(whatsappUrl, '_blank');
+// Préparer le message pour Instagram
+async function sendToInstagram(name, text) {
+  const message = `🎂 Message pour l'anniversaire de Chaimaa\n\n👤 De : ${name}\n\n💌 Message :\n${text}\n\n✨ Envoyé depuis mon livre d'or d'anniversaire`;
+
+  try {
+    // Copier automatiquement le message dans le presse-papiers
+    await navigator.clipboard.writeText(message);
+
+    // Ouvrir la conversation Instagram
+    window.open(INSTAGRAM_DM_URL, '_blank');
+
+    alert(
+      "💌 Ton message a été copié !\n\n" +
+      "Instagram va s'ouvrir directement.\n" +
+      "Il te suffit de coller le message dans la conversation et de l'envoyer ❤️"
+    );
+  } catch (error) {
+    // Si le navigateur bloque le presse-papiers
+    window.open(INSTAGRAM_DM_URL, '_blank');
+
+    alert(
+      "💌 Instagram va s'ouvrir !\n\n" +
+      "Copie ton message puis colle-le dans la conversation avec @romy.chaimaa_ ❤️"
+    );
+  }
 }
 
 // Formulaire d'ajout de message
-msgForm.addEventListener('submit', function(e) {
+msgForm.addEventListener('submit', async function(e) {
   e.preventDefault();
-  
+
   const name = document.getElementById('msgName').value.trim();
   const text = document.getElementById('msgText').value.trim();
-  
+
   if (!name || !text) {
     alert('Veuillez remplir tous les champs !');
     return;
   }
-  
+
+  const cleanName = name.replace(/[<>]/g, '');
+  const cleanText = text.replace(/[<>]/g, '');
+
+  // Sauvegarder localement le message
   const data = JSON.parse(localStorage.getItem('bday_msgs') || '[]');
   data.unshift({
-    name: name,
-    text: text.replace(/[<>]/g, '')
+    name: cleanName,
+    text: cleanText,
+    date: new Date().toLocaleString('fr-FR')
   });
   localStorage.setItem('bday_msgs', JSON.stringify(data));
-  
+
+  // Vider les champs
   document.getElementById('msgName').value = '';
   document.getElementById('msgText').value = '';
-  
+
+  // Actualiser le livre d'or
   loadMsgs();
+
+  // Effet confettis
   launchConfetti(60);
-  sendToWhatsApp(name, text);
-  
+
+  // Ouvrir Instagram et copier le message
+  await sendToInstagram(cleanName, cleanText);
+
+  // Modifier temporairement le bouton
   const btn = this.querySelector('.btn-primary');
   const originalText = btn.innerHTML;
-  btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Envoyé sur WhatsApp !';
+  btn.innerHTML = '<i class="fa-brands fa-instagram"></i> Instagram ouvert !';
+
   setTimeout(() => {
     btn.innerHTML = originalText;
-  }, 3000);
+  }, 4000);
 });
 
 // ============ MUSIC - GESTION AMÉLIORÉE ============
